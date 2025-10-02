@@ -1,0 +1,15 @@
+{
+  "name": "Level 4: Simple Loop",
+  "start_pos": [
+    0,
+    0
+  ],
+  "goal_pos": [
+    4,
+    0
+  ],
+  "obstacles": [],
+  "gems": [],
+  "grid_size": 5,
+  "hint": "Use a for loop to move forward 4 times!"
+}

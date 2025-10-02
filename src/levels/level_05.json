@@ -1,0 +1,15 @@
+{
+  "name": "Level 5: Square Path",
+  "start_pos": [
+    0,
+    0
+  ],
+  "goal_pos": [
+    0,
+    0
+  ],
+  "obstacles": [],
+  "gems": [],
+  "grid_size": 3,
+  "hint": "Make a complete square: forward, right, forward, right, forward, right, forward, right!"
+}

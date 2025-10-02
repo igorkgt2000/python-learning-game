@@ -1,0 +1,10 @@
+{
+  "name": "Level 16: While Loop Basics",
+  "start_pos": [0, 0],
+  "goal_pos": [9, 0],
+  "obstacles": [],
+  "gems": [[2, 0], [4, 0], [6, 0], [8, 0]],
+  "grid_size": 11,
+  "hint": "You don't know exactly how far to go! Use: while not is_goal(): move_forward()"
+}
+

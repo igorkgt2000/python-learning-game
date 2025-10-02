@@ -1,0 +1,10 @@
+{
+  "name": "Level 13: Selective Collection",
+  "start_pos": [0, 0],
+  "goal_pos": [6, 0],
+  "obstacles": [],
+  "gems": [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0]],
+  "grid_size": 8,
+  "hint": "Move forward checking each position. Use if is_gem() to collect only when there's a gem!"
+}
+

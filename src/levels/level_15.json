@@ -1,0 +1,10 @@
+{
+  "name": "Level 15: The Maze Master",
+  "start_pos": [0, 0],
+  "goal_pos": [7, 7],
+  "obstacles": [[1, 0], [1, 1], [1, 2], [3, 2], [3, 3], [3, 4], [5, 4], [5, 5], [5, 6]],
+  "gems": [[2, 1], [4, 3], [6, 5], [6, 6]],
+  "grid_size": 9,
+  "hint": "Navigate this complex maze using loops and if statements. Think step by step!"
+}
+

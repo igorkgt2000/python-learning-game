@@ -1,0 +1,10 @@
+{
+  "name": "Level 7: Counting Steps",
+  "start_pos": [0, 0],
+  "goal_pos": [7, 0],
+  "obstacles": [],
+  "gems": [[1, 0], [3, 0], [5, 0], [6, 0]],
+  "grid_size": 8,
+  "hint": "Count how many steps you need, then use range() with that number!"
+}
+

@@ -1,0 +1,10 @@
+{
+  "name": "Level 9: Spiral Journey",
+  "start_pos": [0, 0],
+  "goal_pos": [2, 2],
+  "obstacles": [],
+  "gems": [[1, 0], [2, 0], [2, 1], [1, 1], [1, 2]],
+  "grid_size": 4,
+  "hint": "Create a spiral: move 2, turn, move 2, turn, move 1, turn, move 1, turn. Can you use a loop?"
+}
+

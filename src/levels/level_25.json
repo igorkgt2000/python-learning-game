@@ -1,0 +1,10 @@
+{
+  "name": "Level 25: Recursion Introduction",
+  "start_pos": [0, 0],
+  "goal_pos": [5, 0],
+  "obstacles": [],
+  "gems": [[1, 0], [2, 0], [3, 0], [4, 0]],
+  "grid_size": 7,
+  "hint": "Try recursion! def move_to_goal(): if not is_goal(): move_forward(); move_to_goal(). Mind the base case!"
+}
+

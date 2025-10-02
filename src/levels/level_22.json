@@ -1,0 +1,10 @@
+{
+  "name": "Level 22: Reusable Pattern",
+  "start_pos": [0, 0],
+  "goal_pos": [0, 0],
+  "obstacles": [],
+  "gems": [[2, 0], [2, 2], [0, 2]],
+  "grid_size": 4,
+  "hint": "Define a function for a repeated pattern: move 2, turn right. Call it 4 times to make a square!"
+}
+

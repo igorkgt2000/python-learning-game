@@ -1,0 +1,10 @@
+{
+  "name": "Level 10: Rectangle Challenge",
+  "start_pos": [0, 0],
+  "goal_pos": [0, 0],
+  "obstacles": [],
+  "gems": [[3, 0], [5, 0], [5, 2], [5, 4], [3, 4], [1, 4], [1, 2]],
+  "grid_size": 7,
+  "hint": "Draw a rectangle! Move forward 5, turn right, move forward 4, turn right, move forward 5, turn right, move forward 4. Use loops!"
+}
+

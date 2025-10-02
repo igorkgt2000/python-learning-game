@@ -1,0 +1,10 @@
+{
+  "name": "Level 18: Collect Them All",
+  "start_pos": [0, 0],
+  "goal_pos": [7, 0],
+  "obstacles": [],
+  "gems": [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0]],
+  "grid_size": 9,
+  "hint": "Move forward while checking for gems. Collect all gems before reaching the goal!"
+}
+

@@ -1,0 +1,10 @@
+{
+  "name": "Level 23: Parameters Power",
+  "start_pos": [0, 0],
+  "goal_pos": [5, 3],
+  "obstacles": [],
+  "gems": [[2, 0], [3, 1], [4, 2]],
+  "grid_size": 7,
+  "hint": "Define: def move_n(steps): for i in range(steps): move_forward(). Use it with different numbers!"
+}
+

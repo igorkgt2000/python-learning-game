@@ -1,0 +1,10 @@
+{
+  "name": "Level 8: Turning Pattern",
+  "start_pos": [0, 0],
+  "goal_pos": [3, 3],
+  "obstacles": [],
+  "gems": [[1, 0], [1, 1], [2, 1], [2, 2], [3, 2]],
+  "grid_size": 5,
+  "hint": "You need to repeat a pattern: move forward, turn right, move forward. How many times?"
+}
+

@@ -1,0 +1,10 @@
+{
+  "name": "Level 11: Decision Time",
+  "start_pos": [0, 0],
+  "goal_pos": [4, 0],
+  "obstacles": [[2, 0]],
+  "gems": [[3, 0]],
+  "grid_size": 6,
+  "hint": "There's a wall blocking your path! Use if is_clear() to check before moving. Go around it!"
+}
+

@@ -46,7 +46,7 @@ from typing import Optional, List, Tuple
 from enum import Enum
 
 from .config import Config
-from .grid import Grid
+from .grid import Grid, TileType
 from .player import Player
 from .renderer import Renderer
 from .level import Level

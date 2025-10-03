@@ -453,6 +453,64 @@ class Game:
         # Double-buffering prevents flickering
         pygame.display.flip()
     
+    def load_level_from_data(self, level: Level) -> bool:
+        """
+        Load a level from a Level object (loaded from JSON).
+        
+        This method takes a pre-constructed Level object and sets up
+        the game with it. Used by the UI when loading from LevelLoader.
+        
+        Args:
+            level (Level): Level object to load
+        
+        Returns:
+            bool: True if level loaded successfully
+        
+        Side Effects:
+            - Sets self.current_level
+            - Creates new Grid with level's grid_size
+            - Resets player to starting position
+            - Sets up obstacles and gems in grid
+            - Changes state to PLAYING
+        
+        Example:
+            >>> level = Level.from_dict(level_data)
+            >>> game.load_level_from_data(level)
+            True
+        """
+        try:
+            # Set the current level
+            self.current_level = level
+            
+            # Create new grid with level's size
+            self.grid = Grid(level.grid_size, level.grid_size)
+            
+            # Set up obstacles
+            for obstacle in level.obstacles:
+                self.grid.set_tile(obstacle[0], obstacle[1], TileType.WALL)
+            
+            # Set up gems
+            for gem in level.gems:
+                self.grid.set_tile(gem[0], gem[1], TileType.GEM)
+            
+            # Set up goal
+            self.grid.set_tile(level.goal_pos[0], level.goal_pos[1], TileType.GOAL)
+            
+            # Reset player to level's starting position
+            self.player = Player(level.start_pos[0], level.start_pos[1])
+            
+            # Set game state to playing
+            self.state = GameState.PLAYING
+            
+            # Reset level index (will be set by caller)
+            self.level_index = 0
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error loading level: {e}")
+            return False
+    
     def load_level(self, level_index: int) -> bool:
         """
         Load and initialize a specific level.

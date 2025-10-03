@@ -29,11 +29,15 @@ import tkinter as tk
 from tkinter import ttk
 import threading
 import pygame
+import os
+import sys
+from pathlib import Path
 from typing import Optional, Callable
 
 from core.game import Game, GameState
 from core.config import Config
 from ui.code_editor import CodeEditor
+from levels.level_loader import LevelLoader
 
 class MainWindow:
     """
@@ -81,6 +85,9 @@ class MainWindow:
         self.game: Optional[Game] = None  # Game engine (created on start)
         self.game_thread: Optional[threading.Thread] = None  # Game loop thread
         self.running = False  # Game running state
+        self.pygame_initialized = False  # Track Pygame initialization
+        self.pygame_screen = None  # Pygame rendering surface
+        self.level_loader = None  # Level loader for game levels
         
         # Create main Tkinter window
         self.root = tk.Tk()
@@ -95,6 +102,9 @@ class MainWindow:
         
         # Initialize game engine
         self._initialize_game()
+        
+        # Start game render loop (60 FPS updates)
+        self._game_loop()
     
     def _create_ui(self):
         """
@@ -213,35 +223,52 @@ class MainWindow:
     
     def _initialize_game(self):
         """
-        Initialize the game engine.
+        Initialize the game engine with Pygame.
         
-        Placeholder for future Pygame-Tkinter integration.
-        When fully implemented, this will:
-        - Initialize Pygame rendering
-        - Embed Pygame surface in Tkinter canvas
-        - Set up game rendering loop
+        Sets up Pygame rendering to work alongside Tkinter:
+        - Initializes Pygame in "headless" mode (no separate window)
+        - Creates off-screen surface for rendering
+        - Loads all game levels
+        - Creates game engine instance
         
-        Current Status:
-            Just logs initialization status. Game is actually
-            created when user clicks "Start Game".
+        The rendered Pygame surface is converted to PhotoImage
+        and displayed in the Tkinter canvas each frame.
         """
         try:
-            # TODO: Initialize Pygame integration with Tkinter canvas
-            # This is an advanced technique requiring os.environ setup
-            self._update_status("Game initialized")
+            # Initialize Pygame (without audio to avoid conflicts)
+            os.environ['SDL_AUDIODRIVER'] = 'dummy'  # No audio (avoids audio driver issues)
+            pygame.init()
+            
+            # Create off-screen Pygame surface (we'll blit this to Tkinter)
+            self.pygame_screen = pygame.Surface((400, 400))
+            self.pygame_initialized = True
+            
+            # Load all levels
+            levels_dir = Path(__file__).parent.parent / 'levels'
+            self.level_loader = LevelLoader(levels_dir)
+            self._update_status(f"Loaded {self.level_loader.get_level_count()} levels")
+            
+            # Create game engine instance
+            self.game = Game(self.config)
+            self.game.screen = self.pygame_screen  # Use our off-screen surface
+            
+            self._update_status("Game engine initialized ✓")
+            
         except Exception as e:
             self._update_status(f"Game initialization failed: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _start_game(self):
         """
         Start or resume the game.
         
-        Creates game engine instance and starts first level.
+        Loads first level from the level loader and initializes game state.
         Updates button states and level info display.
         
         Side Effects:
-            - Creates Game instance if it doesn't exist
-            - Starts level 1
+            - Loads level 1 from JSON
+            - Sets up grid, player, gems, obstacles
             - Enables Pause/Reset buttons
             - Disables Start button
             - Updates UI with level information
@@ -250,10 +277,20 @@ class MainWindow:
             Errors are caught and displayed in output area.
         """
         try:
-            if not self.game:
-                # First time starting - create game engine
-                self.game = Game(self.config)
-                self.game.start_new_game()  # Load level 1
+            if not self.game or not self.level_loader:
+                self._update_status("Game not initialized properly!")
+                return
+            
+            # Load first level
+            level = self.level_loader.get_level(0)
+            if not level:
+                self._update_status("No levels found!")
+                return
+            
+            # Set up the game with this level
+            self.game.load_level_from_data(level)
+            self.game.state = GameState.PLAYING
+            self.game.level_index = 0
             
             # Set running state
             self.running = True
@@ -264,11 +301,13 @@ class MainWindow:
             self.reset_button.config(state='normal')
             
             # Update displays
-            self._update_status("Game started")
+            self._update_status(f"Started: {level.name}")
             self._update_level_info()
             
         except Exception as e:
             self._update_status(f"Failed to start game: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _pause_game(self):
         """
@@ -428,6 +467,59 @@ class MainWindow:
             if level.get_hint():
                 self.hint_label.config(text=f"Hint: {level.get_hint()}")
     
+    def _game_loop(self):
+        """
+        Main game rendering loop (runs continuously via Tkinter's after()).
+        
+        This method is called approximately 60 times per second and:
+        1. Updates game state (animations, particles)
+        2. Renders game to Pygame surface
+        3. Converts Pygame surface to Tkinter PhotoImage
+        4. Displays on canvas
+        5. Schedules next frame
+        
+        The loop runs continuously but only renders when game is active.
+        Uses Tkinter's after() for non-blocking updates.
+        """
+        try:
+            if self.pygame_initialized and self.game:
+                # Update game animations (even when paused, for visual effects)
+                dt = 1.0 / 60.0  # Target 60 FPS
+                
+                # Render game to off-screen surface
+                self.pygame_screen.fill(self.config.BACKGROUND_COLOR)
+                
+                if self.game.grid and self.game.player and self.game.current_level:
+                    # Render all game elements
+                    self.game.renderer.update(dt)
+                    self.game.renderer.render_grid(self.game.grid)
+                    self.game.renderer.render_player(self.game.player)
+                    self.game.renderer.render_ui(self.game.player, self.game.current_level)
+                    self.game.renderer.render_particles()
+                
+                # Convert Pygame surface to Tkinter-compatible format
+                # This is the magic that bridges Pygame and Tkinter!
+                pygame_string = pygame.image.tostring(self.pygame_screen, 'RGB')
+                pil_image = tk.PhotoImage(width=400, height=400)
+                
+                # Alternative: Use PIL for better conversion (if available)
+                try:
+                    from PIL import Image, ImageTk
+                    pil_img = Image.frombytes('RGB', (400, 400), pygame_string)
+                    photo = ImageTk.PhotoImage(pil_img)
+                    self.game_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+                    self.game_canvas.image = photo  # Keep reference to prevent garbage collection
+                except ImportError:
+                    # Fallback: Direct pygame string (may not display properly)
+                    pass
+                
+        except Exception as e:
+            # Don't crash the loop on render errors
+            print(f"Render error: {e}")
+        
+        # Schedule next frame (16ms = ~60 FPS)
+        self.root.after(16, self._game_loop)
+    
     def _on_closing(self):
         """
         Handle window close event (X button).
@@ -435,7 +527,8 @@ class MainWindow:
         Performs clean shutdown:
         1. Stop game loop
         2. Stop game engine
-        3. Destroy Tkinter window
+        3. Quit Pygame
+        4. Destroy Tkinter window
         
         This prevents the application from hanging when user
         closes the window.
@@ -446,6 +539,10 @@ class MainWindow:
         # Stop game engine if it exists
         if self.game:
             self.game.running = False
+        
+        # Quit Pygame
+        if self.pygame_initialized:
+            pygame.quit()
         
         # Destroy window and exit Tkinter loop
         self.root.destroy()

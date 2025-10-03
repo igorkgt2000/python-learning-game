@@ -496,26 +496,40 @@ class MainWindow:
                     self.game.renderer.render_player(self.game.player)
                     self.game.renderer.render_ui(self.game.player, self.game.current_level)
                     self.game.renderer.render_particles()
+                else:
+                    # Show "Click Start Game" message
+                    import pygame.font
+                    font = pygame.font.Font(None, 36)
+                    text = font.render("Click 'Start Game' to Begin", True, (255, 255, 255))
+                    text_rect = text.get_rect(center=(200, 200))
+                    self.pygame_screen.blit(text, text_rect)
                 
                 # Convert Pygame surface to Tkinter-compatible format
                 # This is the magic that bridges Pygame and Tkinter!
-                pygame_string = pygame.image.tostring(self.pygame_screen, 'RGB')
-                pil_image = tk.PhotoImage(width=400, height=400)
-                
-                # Alternative: Use PIL for better conversion (if available)
                 try:
                     from PIL import Image, ImageTk
+                    # Convert pygame surface to PIL Image
+                    pygame_string = pygame.image.tostring(self.pygame_screen, 'RGB')
                     pil_img = Image.frombytes('RGB', (400, 400), pygame_string)
                     photo = ImageTk.PhotoImage(pil_img)
+                    
+                    # Clear canvas and draw new image
+                    self.game_canvas.delete("all")
                     self.game_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
                     self.game_canvas.image = photo  # Keep reference to prevent garbage collection
-                except ImportError:
-                    # Fallback: Direct pygame string (may not display properly)
-                    pass
+                except ImportError as e:
+                    # PIL not available - show error
+                    self.game_canvas.delete("all")
+                    self.game_canvas.create_text(200, 200, text="Error: Pillow not installed\npip install Pillow", 
+                                                fill="red", font=("Arial", 14))
+                except Exception as e:
+                    print(f"Image conversion error: {e}")
                 
         except Exception as e:
             # Don't crash the loop on render errors
             print(f"Render error: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Schedule next frame (16ms = ~60 FPS)
         self.root.after(16, self._game_loop)

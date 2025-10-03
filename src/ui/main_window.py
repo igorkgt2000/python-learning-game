@@ -498,7 +498,6 @@ class MainWindow:
                     self.game.renderer.render_particles()
                 else:
                     # Show "Click Start Game" message
-                    import pygame.font
                     font = pygame.font.Font(None, 36)
                     text = font.render("Click 'Start Game' to Begin", True, (255, 255, 255))
                     text_rect = text.get_rect(center=(200, 200))
